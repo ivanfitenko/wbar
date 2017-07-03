@@ -24,7 +24,16 @@ static App *p;
 static Bar *barra;
 static XWin barwin(50, 50, 50, 50);
 
+//FIXME 20170703: remove following commented code if you see it after 20180703,
+// and also remove the code with the same FIXME node from this file and Bar.cc
+
+/* Not sure, maybe the following code helped with KDE3, but now at 2017,
+the code seems just a whole bug: it would just add snapshots of older wbars to
+background. Maybe, this all worked before seamless redraw was implemented, and
+wbar was redrawn on each icon operation?
 unsigned long bg_window;
+*/
+
 void corpshandler(int);
 int mapIcons();
 static int refl_size;
@@ -542,11 +551,20 @@ int mapIcons() {
 
     for (unsigned long k = 0; k < len; k++) {
       Window w = (Window) array[k];
+	
+	//FIXME 20170703: remove following commented code if you see it after 20180703,
+	//and also remove the code blochs with the same FIXME note from this
+	//file and Xwin.cc
 
+	/* Not sure, maybe the following code helped with KDE3, but now at 2017,
+	the code seems just a whole bug: it would just add snapshots of older wbars to
+	background. Maybe, this all worked before seamless redraw was implemented, and
+	wbar was redrawn on each icon operation?
       if (barwin.issetHint(w, "_NET_WM_WINDOW_TYPE",
                            "_NET_WM_WINDOW_TYPE_DESKTOP") && firstrun) {
         bg_window = w;
       }
+*/
 
       if (!barwin.issetHint(w, "_NET_WM_STATE", "_NET_WM_STATE_SKIP_TASKBAR") &&
           (barwin.issetHint(w, "_NET_WM_WINDOW_TYPE",
