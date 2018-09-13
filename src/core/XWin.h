@@ -65,6 +65,7 @@ public:
   void windowIconify(unsigned long winid);
   int windowFocused();
   void selectWindowInput(unsigned long winid);
+  void flushAll();
 };
 
 Pixmap GetRootPixmap(Display *display);

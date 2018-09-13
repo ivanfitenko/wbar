@@ -387,6 +387,8 @@ int main(int argc, char **argv) {
             barwin.windowAction(barra->iconWinId(inum));
             (void) XSetErrorHandler(oldXHandler);
           } else {
+          std::cout << "sleep 5 then run" << std::endl;
+          sleep (5);
             if ((ev.xbutton.time - dblclk0 < dblclk_tm || dblclk_tm == 0) &&
                 inum != -1) {
               if (fork() == 0) {
@@ -400,6 +402,9 @@ int main(int argc, char **argv) {
             } else {
               dblclk0 = ev.xbutton.time;
             }
+            std::cout << "sleep46" << std::endl;
+            sleep(46);
+            std::cout << "done sleep" << std::endl;
           }
 
           break;
@@ -524,7 +529,8 @@ int mapIcons() {
   unsigned char *titl;
   int iconpos;
   int firstrun = 0;
-
+barwin.flushAll();
+std::cout << "mapicons called" << std::endl;
   iconpos = (configitems - 1);
   // on the first run, there will be no icons displayed
   if (!barra->iconsShown()) {
@@ -588,7 +594,7 @@ int mapIcons() {
         }
 
         const char *title = (const char *)titl;
-
+std::cout << "cmnd:" << cmnd << " title:" << titl << std::endl;
         App *app = new App(icon, cmnd, title, winid);
 
         list.push_back(app);
