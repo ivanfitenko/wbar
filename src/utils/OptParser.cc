@@ -7,8 +7,9 @@ static struct option long_options[] = {
   { "nanim", 1, 0, 0 }, { "zoomf", 1, 0, 0 }, { "jumpf", 1, 0, 0 },
   { "dblclk", 1, 0, 0 }, { "balfa", 1, 0, 0 }, { "falfa", 1, 0, 0 },
   { "filter", 1, 0, 0 }, { "fc", 1, 0, 0 }, { "offset", 1, 0, 0 },
-  { "noreload", 0, 0, 0 }, { "taskbar", 0, 0, 0 }, { "rsize", 1, 0, 0 },
-  { "help", 0, 0, OptParser::HELP }, { "version", 0, 0, OptParser::VERS },
+  { "noreload", 0, 0, 0 }, { "taskbar", 0, 0, 0 }, { "user-icons", 0, 0, 0 },
+  { "rsize", 1, 0, 0 }, { "help", 0, 0, OptParser::HELP },
+  { "version", 0, 0, OptParser::VERS },
   { 0, 0, 0, 0 }
 };
 
