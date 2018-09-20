@@ -28,6 +28,7 @@ public:
     OFFSET,
     NORELOAD,
     TASKBAR,
+    USER_ICONS,
     RSIZE,
     HELP = 'h',
     VERS = 'v'

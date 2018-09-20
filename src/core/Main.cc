@@ -16,10 +16,12 @@
 #include "i18n.h"
 
 static size_t configitems;
-static unsigned int taskbar;
+static unsigned int taskbar, user_icons;
 static std::list<App *> list;
 static std::list<App *>::iterator it;
 static App *p;
+
+static Config config;
 
 static Bar *barra;
 static XWin barwin(50, 50, 50, 50);
@@ -54,8 +56,6 @@ int main(int argc, char **argv) {
     sigh.sa_flags = 0;
     sigemptyset(&sigh.sa_mask); //exclude all signals
     sigaction(SIGCHLD, &sigh, NULL);
-
-    Config config;
 
     OptParser tmpoptparser(argc, argv);
 
@@ -119,6 +119,8 @@ int main(int argc, char **argv) {
       std::cout << "   --above-desk       "
                 << _("run above a desktop app (ie: xfdesktop)") << std::endl;
       std::cout << "   --taskbar		" << _("enable taskbar") << std::endl;
+      std::cout << "   --user-icons		" 
+                << _("use laucher icons for taskbar apps if found") << std::endl;
       std::cout << "   --noreload         "
                 << _("right click does not force reload anymore") << std::endl;
       std::cout << "   --offset i         " << _("offset bar (eg: 20)")
@@ -180,6 +182,7 @@ int main(int argc, char **argv) {
     barwin.setName(basename(argv[0]));
 
     taskbar = optparser.isSet(OptParser::TASKBAR) ? 1 : 0;
+    user_icons = optparser.isSet(OptParser::USER_ICONS) ? 1 : 0;
 
     /* tell X what events we're intrested in */
     barwin.selectInput(
@@ -516,6 +519,13 @@ int mapIcons() {
   int iconpos;
   int firstrun = 0;
 
+  //for icon selection loop when --user-icons is set
+  std::list<App *> launcherList;
+  std::list<App *>::iterator launcherIter;
+  unsigned char *launcherCmd;
+  std::string launcherCmdStr;
+  App *pLauncher;
+
   iconpos = (configitems - 1);
   // on the first run, there will be no icons displayed
   if (!barra->iconsShown()) {
@@ -555,7 +565,24 @@ int mapIcons() {
         icon = "";
         int iiw, iih;
 
-        if (barwin.windowIcon(w, &iiw, &iih) == NULL) {
+        if (user_icons) {
+          launcherList = config.getAppList();
+          launcherIter = launcherList.begin();
+
+          launcherCmd = barwin.windowProp(&w, "WM_CLASS", &tmp_len);
+          if (!launcherCmd) // no splash screens needed in taskbar. Also, see FIXME below
+            continue;
+          else
+            launcherCmdStr = (char *) launcherCmd;
+
+          for (launcherIter++; launcherIter != launcherList.end(); launcherIter++) {
+            pLauncher = (*launcherIter);
+            if (pLauncher->getCommand() == launcherCmdStr)
+              icon = pLauncher->getIconName();
+          }
+        }
+
+        if ((barwin.windowIcon(w, &iiw, &iih) == NULL) && (icon == "")) {
           icon = pixmapdir + "/" + packagename + "/" + "questionmark.png";
         }
 
@@ -563,9 +590,11 @@ int mapIcons() {
         winid = (unsigned long) w;
         titl = barwin.windowProp(&w, "WM_NAME", &tmp_len);
 
-        // now, THIS is impossible, so we're dealing with an
-        // old NET_CLIENT_LIST
+        // Without WM_NAME, either there is a splashscreen window which we should
+        // skip, or we have an old NET_CLIENT_LIST. FIXME: the second option is not
+        // dealt with yet. We need to retreive a new NET_CLIENT_LIST and reiterate
         if (!titl) {
+          std::cout << "Not adding icon: no WM_NAME for id " << winid << std::endl;
           continue;
         }
 
@@ -592,6 +621,8 @@ int mapIcons() {
         //then there is no need to add icons
         {
       return 0;
+      //TODO: there might be a case when icon of an exising window has changed, e.g
+      // some messenger wants to show that there are new messages. We need to track it
     }
 
   for (it++; it != list.end(); it++) {

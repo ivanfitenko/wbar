@@ -401,6 +401,11 @@ void set_config_states(std::string command) {
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(checkbutton), true);
   }
 
+  if (opt.isSet(OptParser::USER_ICONS)) {
+    checkbutton = glade_xml_get_widget(xml, "checkbutton_user_icons");
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(checkbutton), true);
+  }
+
   if (opt.isSet(OptParser::RSIZE)) {
     checkbutton = glade_xml_get_widget(xml, "checkbutton_rsize");
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(checkbutton), true);
@@ -986,6 +991,12 @@ std::string getCommand() {
 
   if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkbutton))) {
     command += " --taskbar";
+  }
+
+  checkbutton = glade_xml_get_widget(xml, "checkbutton_user_icons");
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkbutton))) {
+    command += " --user-icons";
   }
 
   checkbutton = glade_xml_get_widget(xml, "checkbutton_rsize");
