@@ -8,7 +8,20 @@
 /* Posicionamiento de la ventana */
 #define MARGEN 4
 
+//FIXME 20170703: remove following commented code if you see it after 20180703,
+// and also remove the code with the same FIXME node from this file and Main.cc
+
+/* Not sure, maybe the following code helped with KDE3, but now at 2017,
+the code seems just a whole bug: it would just add snapshots of older wbars to
+background. Maybe, this all worked before seamless redraw was implemented, and
+wbar was redrawn on each icon operation?
+    // for DEs using an FM-based desktop, set it as bg source
+    if (bg_window) {
+        USE_DRAWABLE((Window) bg_window);
+        // otherwise, snapshot a backgroung pixmap set at the root window
+    } else if (rootmap != None) {
 extern unsigned long bg_window;
+*/
 
 using namespace std;
 
@@ -241,11 +254,21 @@ void Bar::acquireBack() {
     oldXHandler = XSetErrorHandler(rootErrorHandler);
     Pixmap rootmap = GetRootPixmap(window->display);
 
+//FIXME 20170703: remove following commented code if you see it after 20180703,
+// and also remove the code with the same FIXME node from this file and Main.cc
+
+/* Not sure, maybe the following code helped with KDE3, but now at 2017,
+the code seems just a whole bug: it would just add snapshots of older wbars to
+background. Maybe, this all worked before seamless redraw was implemented, and
+wbar was redrawn on each icon operation?
     // for DEs using an FM-based desktop, set it as bg source
     if (bg_window) {
         USE_DRAWABLE((Window) bg_window);
         // otherwise, snapshot a backgroung pixmap set at the root window
     } else if (rootmap != None) {
+WHEN UNCOMMENTING THE CODE, REMOVE THE NEXT UNCOMMENTED "if" CONDITIONAL
+*/
+    if (rootmap != None) {
         USE_DRAWABLE(rootmap);
     } else {
         // last resort: remember a snapshop of the whole display, potentially
