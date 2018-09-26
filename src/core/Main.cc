@@ -522,8 +522,8 @@ int mapIcons() {
   //for icon selection loop when --user-icons is set
   std::list<App *> launcherList;
   std::list<App *>::iterator launcherIter;
-  unsigned char *launcherCmd;
-  std::string launcherCmdStr;
+  unsigned char *appCmd;
+  char * launcherBaseName;
   App *pLauncher;
 
   iconpos = (configitems - 1);
@@ -569,15 +569,14 @@ int mapIcons() {
           launcherList = config.getAppList();
           launcherIter = launcherList.begin();
 
-          launcherCmd = barwin.windowProp(&w, "WM_CLASS", &tmp_len);
-          if (!launcherCmd) // no splash screens needed in taskbar. Also, see FIXME below
+          appCmd = barwin.windowProp(&w, "WM_CLASS", &tmp_len);
+          if (!appCmd) // no splash screens needed in taskbar. Also, see FIXME below
             continue;
-          else
-            launcherCmdStr = (char *) launcherCmd;
 
           for (launcherIter++; launcherIter != launcherList.end(); launcherIter++) {
             pLauncher = (*launcherIter);
-            if (pLauncher->getCommand() == launcherCmdStr)
+            launcherBaseName = basename(const_cast<char*>(pLauncher->getCommand().c_str()));
+            if (strncmp((char*)appCmd, launcherBaseName,strlen(launcherBaseName)) == 0)
               icon = pLauncher->getIconName();
           }
         }
