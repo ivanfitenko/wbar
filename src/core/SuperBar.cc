@@ -11,9 +11,9 @@ SuperBar::SuperBar(XWin *win, string barImg, string barFont, int iSize,
                    int iDist, float zFactor, float jFactor, int bOrient,
                    int bPosition, int nAnim, int barAlfa, int unfocusAlfa,
                    int filtSel, unsigned int filtCol, bool dfont, int offset,
-                   bool grow)
+                   bool grow, int refl_perc)
     : Bar(win, barImg, iSize, iDist, zFactor, jFactor, bOrient, bPosition,
-          nAnim, offset, grow),
+          nAnim, offset, grow, refl_perc),
       font(NULL), drawfont(dfont), rest_w(0), filtSel(filtSel),
       filtRed((filtCol & 0x00ff0000) >> 16),
       filtGreen((filtCol & 0x0000ff00) >> 8), filtBlue(filtCol & 0x000000ff),
@@ -139,7 +139,7 @@ void SuperBar::initFilters() {
 /* Add or remove an Icon to/from the bar if there are any changes */ /*{{{*/
 void SuperBar::addIcon(unsigned int iconpos, string path, string comm,
                        string txt, unsigned long winid, unsigned char *icondata,
-                       int iw, int ih, int refl_size) {
+                       int iw, int ih, int refl_perc) {
   SuperIcon *ic;
   int textW, textH;
   while (iconpos < icons.size()) {
@@ -157,7 +157,7 @@ void SuperBar::addIcon(unsigned int iconpos, string path, string comm,
   }
 
   icons.push_back(new SuperIcon(
-      path, comm, txt, winid, icondata, iw, ih, refl_size,
+      path, comm, txt, winid, icondata, iw, ih, refl_perc,
       (int) icon_offset + icon_size / 2 + icons.size() * icon_unit, // x coord
       y + (int)(0.125 * icon_size), textW, textH));                 // y coord
 
@@ -313,11 +313,15 @@ void SuperBar::render() {
       }
 
       if (orientation == 0)
-        BLEND_IMAGE(cur_im, 0, 0, cur_ic->osize, cur_ic->osize, cur_ic->x,
-                    cur_ic->y, cur_ic->size, cur_ic->size);
+        BLEND_IMAGE(cur_im, 0, 0,
+                    cur_ic->osize, cur_ic->osize + cur_ic->osize*refl_perc/100,
+                    cur_ic->x, cur_ic->y,
+                    cur_ic->size, cur_ic->size + cur_ic->size*refl_perc/100);
       else
-        BLEND_IMAGE(cur_im, 0, 0, cur_ic->osize, cur_ic->osize, cur_ic->y,
-                    cur_ic->x, cur_ic->size, cur_ic->size);
+        BLEND_IMAGE(cur_im, 0, 0,
+                    cur_ic->osize, cur_ic->osize + cur_ic->osize*refl_perc/100,
+                    cur_ic->y, cur_ic->x,
+                    cur_ic->size, cur_ic->size + cur_ic->size*refl_perc/100);
 
       if (font && drawfont) {
 

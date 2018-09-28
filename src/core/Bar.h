@@ -54,6 +54,8 @@ protected:
   int orientation;
   int position;
   bool grow;
+  /* reflection percentage for icons */
+  int refl_perc;
 
   /* actual zoomed icon */
   int zoomed_icon;
@@ -80,13 +82,13 @@ public:
 
   Bar(XWin *win, std::string barImg, int iSize, int iDist, float zFactor,
       float jFactor, int bOrient, int bPosition, int nAnim, int offset,
-      bool grow);
+      bool grow, int refl_perc);
 
   virtual ~Bar();
 
   /* add an Icon */
   void addIcon(std::string path, std::string comm, unsigned long winid,
-               unsigned char *icondata, int iw, int ih, int refl_size);
+               unsigned char *icondata, int iw, int ih, int refl_perc);
 
   /* Icon information */
   int iconIndex(int mouse_x);
