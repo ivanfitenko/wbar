@@ -36,7 +36,7 @@ protected:
 public:
 
   Icon(std::string iconImg, std::string cmd, int x, int y, unsigned long winid,
-       unsigned char *icondata, int iw, int ih, int refl_perc);
+       unsigned char *icondata, int iw, int ih, int refl_perc, int refl_alpha);
   ~Icon();
 };
 

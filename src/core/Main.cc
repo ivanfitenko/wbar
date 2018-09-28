@@ -30,6 +30,7 @@ unsigned long bg_window;
 void corpshandler(int);
 int mapIcons();
 static int refl_perc;
+static int refl_alpha;
 static XErrorHandler oldXHandler = (XErrorHandler) 0;
 static int eErrorHandler(Display *, XErrorEvent *);
 
@@ -150,6 +151,8 @@ int main(int argc, char **argv) {
                 << std::endl;
       std::cout << "   --rsize  i         "
                 << _("reflection size in percents (0-100)") << std::endl;
+      std::cout << "   --ralpha  i         "
+                << _("reflection alpha (0-100)") << std::endl;
       std::cout << "   --falfa  i         " << _("unfocused bar alfa (0-100)")
                 << std::endl;
       std::cout << "   --filter i         "
@@ -208,6 +211,9 @@ int main(int argc, char **argv) {
     refl_perc = optparser.isSet(OptParser::RSIZE)
                     ? atoi(optparser.getArg(OptParser::RSIZE).c_str())
                     : 0;
+    refl_alpha = optparser.isSet(OptParser::RALPHA)
+                    ? atoi(optparser.getArg(OptParser::RALPHA).c_str())
+                    : 100;
 
     bool grow = optparser.isSet(OptParser::GROW) ? true : false;
 
@@ -250,7 +256,7 @@ int main(int argc, char **argv) {
               ? atoi(optparser.getArg(OptParser::OFFSET).c_str())
               : 0,
           grow,
-          refl_perc);
+          refl_perc, refl_alpha);
     } else {
       barra = new Bar(&barwin, p->getIconName(),
                       optparser.isSet(OptParser::ISIZE)
@@ -272,7 +278,7 @@ int main(int argc, char **argv) {
                       optparser.isSet(OptParser::OFFSET)
                           ? atoi(optparser.getArg(OptParser::OFFSET).c_str())
                           : 0,
-                      grow, refl_perc);
+                      grow, refl_perc, refl_alpha);
     }
 
     if (p) {
@@ -633,7 +639,7 @@ int mapIcons() {
       if (p->getIconName() != "")
         ((SuperBar *)barra)
             ->addIcon(iconpos, p->getIconName(), p->getCommand(), p->getTitle(),
-                      p->getWinid(), NULL, 0, 0, refl_perc);
+                      p->getWinid(), NULL, 0, 0, refl_perc, refl_alpha);
       else {
         int iw, ih;
         unsigned char *icondata;
@@ -643,7 +649,7 @@ int mapIcons() {
         if (icondata) {
           ((SuperBar *)barra)->addIcon(
               iconpos, p->getIconName(), p->getCommand(), p->getTitle(),
-              p->getWinid(), icondata, iw, ih, refl_perc);
+              p->getWinid(), icondata, iw, ih, refl_perc, refl_alpha);
         } else {
           std::cout << "window has gone, not adding" << std::endl;
           return -1;

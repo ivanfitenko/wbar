@@ -21,7 +21,7 @@ static int rootErrorHandler(Display *display, XErrorEvent *theEvent);
 /* Bar Constructor & Destructor */
 Bar::Bar(XWin *win, string barImg, int iSize, int iDist, float zFactor,
          float jFactor, int bOrient, int bPosition, int nAnim, int offset,
-         bool grow, int refl_perc)
+         bool grow, int refl_perc, int refl_alpha)
     : /* Initialization */
       buffer(0),
       cleaning_buffer(0), barback(0), bar(0), window(win), icon_dist(iDist),
@@ -32,6 +32,7 @@ Bar::Bar(XWin *win, string barImg, int iSize, int iDist, float zFactor,
     this->bOffset = offset;
     this->grow = grow;
     this->refl_perc = refl_perc;
+    this->refl_alpha = refl_alpha;
 
     /* Load Bar back ground */
     if (!(bar = LOAD_IMAGE(barImg.c_str()))) {
@@ -89,12 +90,13 @@ Bar::~Bar() {
 
 /* Add Icon */
 void Bar::addIcon(string path, string comm, unsigned long winid,
-                  unsigned char *icondata, int iw, int ih, int refl_perc) {
+                  unsigned char *icondata, int iw, int ih, int refl_perc, 
+                  int refl_alpha) {
     icons.push_back(new Icon(
         path, comm,
         (int) icon_offset + icon_size / 2 + icons.size() * icon_unit, // x coord
         y + (int)(0.125 * icon_size),                                 // y coord
-        winid, icondata, iw, ih, refl_perc));
+        winid, icondata, iw, ih, refl_perc, refl_alpha));
 }
 /*}}}*/
 

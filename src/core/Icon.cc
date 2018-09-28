@@ -7,11 +7,12 @@ using namespace std;
 _image icontmp;
 
 Icon::Icon(string iconImg, string cmd, int xx, int yy, unsigned long winid,
-           unsigned char *icondata, int iw, int ih, int refl_perc)
+           unsigned char *icondata, int iw, int ih, int refl_perc, int refl_alpha)
     : ox(xx), oy(yy), x(xx), y(yy), need_update(1), cx(xx), command(cmd),
       wid(winid) {
 
   int refl_h;
+  Imlib_Filter imageAlpha;
 
   if (iconImg == "") {
     icon = imlib_create_image(iw, ih + ih*refl_perc/100);
@@ -53,9 +54,19 @@ Icon::Icon(string iconImg, string cmd, int xx, int yy, unsigned long winid,
     imlib_apply_color_modifier();
     /*once initialized, reset the color modifier for future usage */
     imlib_context_set_color_modifier(NULL);
-    imlib_blend_image_onto_image(icon, 1, 0, 0, iw, ih, 0, 0, iw, ih);
+
+    /* first, blend transparent reflection */
+    imageAlpha = imlib_create_filter(0);
+    imlib_context_set_filter(imageAlpha);
+    imlib_filter_set_alpha(0, 0, refl_alpha, 0, 0, 0);
+    imlib_filter_divisors(100, 0, 0, 0);
     imlib_blend_image_onto_image_skewed(icon, 1, 0, 0, iw, ih, 0, ih + refl_h, iw, 0,
                                         0, -refl_h);
+    imlib_image_filter();
+    imlib_free_filter();
+    /* blend original icon */
+    imlib_blend_image_onto_image(icon, 1, 0, 0, iw, ih, 0, 0, iw, ih);
+
     icon = imlib_clone_image();
   }
 

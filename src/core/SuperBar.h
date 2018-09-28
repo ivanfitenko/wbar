@@ -39,13 +39,14 @@ public:
   SuperBar(XWin *win, std::string barImg, std::string barFont, int iSize,
            int iDist, float zFactor, float jFactor, int bOrient, int bPosition,
            int nAnim, int barAlfa, int unfocusAlfa, int filtSel,
-           unsigned int filtCol, bool dfont, int offset, bool grow, int refl_perc);
+           unsigned int filtCol, bool dfont, int offset, bool grow,
+           int refl_perc, int refl_alpha);
 
   ~SuperBar();
 
   void addIcon(unsigned int iconpos, std::string path, std::string comm,
                std::string text, unsigned long winid, unsigned char *icondata,
-               int iw, int ih, int refl_perc);
+               int iw, int ih, int refl_perc, int refl_alpha);
   void updateLength(int newSize);
 };
 
