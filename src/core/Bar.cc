@@ -34,7 +34,7 @@ static int rootErrorHandler(Display *display, XErrorEvent *theEvent);
 /* Bar Constructor & Destructor */
 Bar::Bar(XWin *win, string barImg, int iSize, int iDist, float zFactor,
          float jFactor, int bOrient, int bPosition, int nAnim, int offset,
-         bool grow)
+         bool grow, int refl_perc, int refl_alpha)
     : /* Initialization */
       buffer(0),
       cleaning_buffer(0), barback(0), bar(0), window(win), icon_dist(iDist),
@@ -44,6 +44,8 @@ Bar::Bar(XWin *win, string barImg, int iSize, int iDist, float zFactor,
 
     this->bOffset = offset;
     this->grow = grow;
+    this->refl_perc = refl_perc;
+    this->refl_alpha = refl_alpha;
 
     /* Load Bar back ground */
     if (!(bar = LOAD_IMAGE(barImg.c_str()))) {
@@ -101,12 +103,13 @@ Bar::~Bar() {
 
 /* Add Icon */
 void Bar::addIcon(string path, string comm, unsigned long winid,
-                  unsigned char *icondata, int iw, int ih, int refl_size) {
+                  unsigned char *icondata, int iw, int ih, int refl_perc, 
+                  int refl_alpha) {
     icons.push_back(new Icon(
         path, comm,
         (int) icon_offset + icon_size / 2 + icons.size() * icon_unit, // x coord
         y + (int)(0.125 * icon_size),                                 // y coord
-        winid, icondata, iw, ih, refl_size));
+        winid, icondata, iw, ih, refl_perc, refl_alpha));
 }
 /*}}}*/
 
@@ -165,7 +168,7 @@ void Bar::scale(bool updateBG) {
     window->w = (int)(width + 2 * icon_offset);
     window->h =
         height + 2 * MARGEN + (int)((up_growth > 0.0 ? up_growth : 0.0)) +
-        (int)((dn_growth > 0.0 ? dn_growth : 0.0));
+        (int)((dn_growth > 0.0 ? dn_growth : 0.0)) + (height * refl_perc / 100);
 
     /* Initial Bar position */
 
@@ -275,7 +278,7 @@ WHEN UNCOMMENTING THE CODE, REMOVE THE NEXT UNCOMMENTED "if" CONDITIONAL
         // resulting in some artifacts from the windows above the bar
         if (!screenBack) {
             USE_DRAWABLE(DefaultRootWindow(window->display));
-	    screenBack = IMAGE_FROM_DRAWABLE(0, 0, window->screenWidth(),
+            screenBack = IMAGE_FROM_DRAWABLE(0, 0, window->screenWidth(),
                                       window->screenHeight());
         }
         // stand alone complex :) Someone has to fix it to act as two ifs above
@@ -436,7 +439,7 @@ void Bar::drawBack() {
 
         /* Blend the bar */
         SET_BLEND(1);
-        BLEND_IMAGE(bar, 0, 0, owidth, oheight, x, y, width, height);
+        BLEND_IMAGE(bar, 0, 0, owidth, oheight, x, y, width, (height + height*refl_perc/100));
 
     } else {
         BLEND_IMAGE(barback, 0, 0, window->h, window->w, 0, 0, window->h,
@@ -479,6 +482,7 @@ void Bar::render() {
                 BLEND_IMAGE(cur_ic->icon, 0, 0, cur_ic->osize, cur_ic->osize,
                             cur_ic->x, cur_ic->y, cur_ic->size, cur_ic->size);
             else
+//FIXME: reflection was developed only for horizontal bar. Does it work for verical?
                 BLEND_IMAGE(cur_ic->icon, 0, 0, cur_ic->osize, cur_ic->osize,
                             cur_ic->y, cur_ic->x, cur_ic->size, cur_ic->size);
         }

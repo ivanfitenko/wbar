@@ -30,6 +30,7 @@ public:
     TASKBAR,
     USER_ICONS,
     RSIZE,
+    RALPHA,
     HELP = 'h',
     VERS = 'v'
   };

@@ -414,6 +414,14 @@ void set_config_states(std::string command) {
                               atoi(opt.getArg(OptParser::RSIZE).c_str()));
   }
 
+  if (opt.isSet(OptParser::RALPHA)) {
+    checkbutton = glade_xml_get_widget(xml, "checkbutton_ralpha");
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(checkbutton), true);
+    spinbutton = glade_xml_get_widget(xml, "spinbutton_ralpha");
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinbutton),
+                              atoi(opt.getArg(OptParser::RALPHA).c_str()));
+  }
+
   if (opt.isSet(OptParser::ISIZE)) {
     checkbutton = glade_xml_get_widget(xml, "checkbutton_isize");
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(checkbutton), true);
@@ -620,6 +628,11 @@ void set_signals() {
 
   check = glade_xml_get_widget(xml, "checkbutton_rsize");
   widget = glade_xml_get_widget(xml, "spinbutton_rsize");
+  g_signal_connect(G_OBJECT(check), "toggled", G_CALLBACK(checkbutton_toggled),
+                   widget);
+
+  check = glade_xml_get_widget(xml, "checkbutton_ralpha");
+  widget = glade_xml_get_widget(xml, "spinbutton_ralpha");
   g_signal_connect(G_OBJECT(check), "toggled", G_CALLBACK(checkbutton_toggled),
                    widget);
 
@@ -1005,6 +1018,17 @@ std::string getCommand() {
     char text[10];
     command += " --rsize";
     spinbutton = glade_xml_get_widget(xml, "spinbutton_rsize");
+    sprintf(text, " %d",
+            (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinbutton)));
+    command += text;
+  }
+
+  checkbutton = glade_xml_get_widget(xml, "checkbutton_ralpha");
+
+  if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkbutton))) {
+    char text[10];
+    command += " --ralpha";
+    spinbutton = glade_xml_get_widget(xml, "spinbutton_ralpha");
     sprintf(text, " %d",
             (int) gtk_spin_button_get_value(GTK_SPIN_BUTTON(spinbutton)));
     command += text;
