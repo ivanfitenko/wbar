@@ -7,7 +7,8 @@ using namespace std;
 _image icontmp;
 
 Icon::Icon(string iconImg, string cmd, int xx, int yy, unsigned long winid,
-           unsigned char *icondata, int iw, int ih, int refl_perc, int refl_alpha)
+           unsigned char *icondata, int iw, int ih, int icon_size,
+           int refl_perc, int refl_alpha)
     : ox(xx), oy(yy), x(xx), y(yy), need_update(1), cx(xx), command(cmd),
       wid(winid) {
 
@@ -72,7 +73,8 @@ Icon::Icon(string iconImg, string cmd, int xx, int yy, unsigned long winid,
 
   USE_IMAGE(icon);
 
-  osize = size = IMAGE_WIDTH();
+  osize = IMAGE_WIDTH();
+  size = icon_size;
 }
 
 Icon::~Icon() { FREE_IMAGE(icon); }
