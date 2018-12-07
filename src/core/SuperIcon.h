@@ -18,7 +18,7 @@ protected:
 public:
   SuperIcon(std::string iconImg, std::string cmd, std::string txt,
             unsigned long winid, unsigned char *icondata, int iw, int ih,
-            int refl_perc, int refl_alpha, int x, int y, int tw, int th);
+            int icon_size, int refl_perc, int refl_alpha, int x, int y, int tw, int th);
   ~SuperIcon();
 
 };

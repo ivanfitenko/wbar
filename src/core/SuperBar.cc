@@ -142,13 +142,13 @@ void SuperBar::addIcon(unsigned int iconpos, string path, string comm,
                        int iw, int ih, int refl_perc, int refl_alpha) {
   SuperIcon *ic;
   int textW, textH;
-  while (iconpos < icons.size()) {
 
-    if ((icons[iconpos]->wid == winid) &&
-        (((SuperIcon *)icons[iconpos])->text == txt))
-      return;
-    else
-      icons.erase(icons.begin() + iconpos);
+  /*
+  Icon properties for current icon and all subsequent ones (e.g. icon position)
+  may become outdated now, so the list is outdated and needs to be cleaned up.
+  */
+  while (iconpos < icons.size()) {
+    icons.erase(icons.begin() + iconpos);
   }
 
   if (font) {
@@ -157,7 +157,7 @@ void SuperBar::addIcon(unsigned int iconpos, string path, string comm,
   }
 
   icons.push_back(new SuperIcon(
-      path, comm, txt, winid, icondata, iw, ih, refl_perc, refl_alpha,
+      path, comm, txt, winid, icondata, iw, ih, icon_size, refl_perc, refl_alpha,
       (int) icon_offset + icon_size / 2 + icons.size() * icon_unit, // x coord
       y + (int)(0.125 * icon_size), textW, textH));                 // y coord
 

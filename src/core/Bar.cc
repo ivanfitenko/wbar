@@ -109,7 +109,7 @@ void Bar::addIcon(string path, string comm, unsigned long winid,
         path, comm,
         (int) icon_offset + icon_size / 2 + icons.size() * icon_unit, // x coord
         y + (int)(0.125 * icon_size),                                 // y coord
-        winid, icondata, iw, ih, refl_perc, refl_alpha));
+        winid, icondata, iw, ih, icon_size, refl_perc, refl_alpha));
 }
 /*}}}*/
 
