@@ -280,7 +280,8 @@ Atom XWin::issetHint(Window targetWin, const char *reqProp,
 
     for (unsigned int k = 0; k < len; k++) {
       if ((Atom) array[k] == XInternAtom(display, reqHint, True)) {
-        hint = list[k];
+        // As a side effect, return an actual value of atom when it is non-zero
+        hint = (list[k] ? list[k] : 1);
       }
     }
 
