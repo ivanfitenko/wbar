@@ -547,11 +547,12 @@ int mapIcons() {
   if (!barra->iconsShown()) {
     firstrun = 1;
     iconpos = 0;
-  }
-
-  //roll back the list to contain only the icons from config
-  while ((size_t) list.size() > configitems) {
-    list.pop_back();
+  } else {
+    //roll back the list to contain only the icons from config
+    while ((size_t) list.size() > configitems) {
+      list.pop_back();
+    }
+    it=list.end();
     it--;
   }
 
@@ -690,6 +691,7 @@ int mapIcons() {
   barra->scale();
 
   if (firstrun) {
+    // decrement from list.end() to be deferecenceable
     it--;
   }
 
