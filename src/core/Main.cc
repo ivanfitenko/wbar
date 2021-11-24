@@ -582,7 +582,6 @@ int mapIcons() {
           launcherIter = launcherList.begin();
 
           appCmd = barwin.windowProp(&w, "WM_CLASS", &tmp_len);
-          std::cout << tmp_len << std::endl ;
           if (!appCmd) // no splash screens needed in taskbar. Also see FIXME below
             continue;
 
