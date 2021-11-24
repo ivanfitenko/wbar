@@ -538,7 +538,7 @@ int mapIcons() {
   //for icon selection loop when --user-icons is set
   std::list<App *> launcherList;
   std::list<App *>::iterator launcherIter;
-  unsigned char *appCmd;
+  unsigned char *appInstanceClass, *appGeneralClass;
   App *pLauncher;
 
   iconpos = (configitems - 1);
@@ -581,16 +581,34 @@ int mapIcons() {
           launcherList = config.getAppList();
           launcherIter = launcherList.begin();
 
-          appCmd = barwin.windowProp(&w, "WM_CLASS", &tmp_len);
-          if (!appCmd) // no splash screens needed in taskbar. Also see FIXME below
+          appInstanceClass = barwin.windowProp(&w, "WM_CLASS", &tmp_len);
+          appGeneralClass = appInstanceClass + strlen((const char *)appInstanceClass) + 1;
+          if (!appInstanceClass) // no splash screens needed in taskbar. Also see FIXME below
             continue;
 
           for (launcherIter++; launcherIter != launcherList.end(); launcherIter++) {
             pLauncher = (*launcherIter);
-            if (strncasecmp((char*)appCmd,
+            // Compare binary name against this particular instance
+            if (strncasecmp((char*)appInstanceClass,
                 basename(const_cast<char*>(pLauncher->getCommand().c_str())),
-                strlen(basename(const_cast<char*>(pLauncher->getCommand().c_str())))) == 0)
+                strlen(basename(const_cast<char*>(pLauncher->getCommand().c_str())))) == 0) {
               icon = pLauncher->getIconName();
+            // Compare binary name against general window class for app
+            } else if (strncasecmp((char*)appGeneralClass,
+                basename(const_cast<char*>(pLauncher->getCommand().c_str())),
+                strlen(basename(const_cast<char*>(pLauncher->getCommand().c_str())))) == 0) {
+              icon = pLauncher->getIconName();
+            // Compare configured title against this particular instance
+            } else if (strncasecmp((char*)appInstanceClass,
+                basename(const_cast<char*>(pLauncher->getTitle().c_str())),
+                strlen(basename(const_cast<char*>(pLauncher->getTitle().c_str())))) == 0) {
+              icon = pLauncher->getIconName();
+            // Compare configured title  against general window class for app
+            } else if (strncasecmp((char*)appGeneralClass,
+                basename(const_cast<char*>(pLauncher->getTitle().c_str())),
+                strlen(basename(const_cast<char*>(pLauncher->getTitle().c_str())))) == 0) {
+              icon = pLauncher->getIconName();
+            }
           }
         }
 
