@@ -538,8 +538,7 @@ int mapIcons() {
   //for icon selection loop when --user-icons is set
   std::list<App *> launcherList;
   std::list<App *>::iterator launcherIter;
-  unsigned char *appCmd;
-  char * launcherBaseName;
+  unsigned char *appInstanceClass, *appGeneralClass;
   App *pLauncher;
 
   iconpos = (configitems - 1);
@@ -569,20 +568,6 @@ int mapIcons() {
 
     for (unsigned long k = 0; k < len; k++) {
       Window w = (Window) array[k];
-	
-	//FIXME 20170703: remove following commented code if you see it after 20180703,
-	//and also remove the code blochs with the same FIXME note from this
-	//file and Xwin.cc
-
-	/* Not sure, maybe the following code helped with KDE3, but now at 2017,
-	the code seems just a whole bug: it would just add snapshots of older wbars to
-	background. Maybe, this all worked before seamless redraw was implemented, and
-	wbar was redrawn on each icon operation?
-      if (barwin.issetHint(w, "_NET_WM_WINDOW_TYPE",
-                           "_NET_WM_WINDOW_TYPE_DESKTOP") && firstrun) {
-        bg_window = w;
-      }
-*/
 
       if (!barwin.issetHint(w, "_NET_WM_STATE", "_NET_WM_STATE_SKIP_TASKBAR") &&
           (barwin.issetHint(w, "_NET_WM_WINDOW_TYPE",
@@ -591,19 +576,39 @@ int mapIcons() {
         icon = "";
         int iiw, iih;
 
+        // If an icon is configured for a launcher, use it for taskbar icon.
         if (user_icons) {
           launcherList = config.getAppList();
           launcherIter = launcherList.begin();
 
-          appCmd = barwin.windowProp(&w, "WM_CLASS", &tmp_len);
-          if (!appCmd) // no splash screens needed in taskbar. Also, see FIXME below
+          appInstanceClass = barwin.windowProp(&w, "WM_CLASS", &tmp_len);
+          appGeneralClass = appInstanceClass + strlen((const char *)appInstanceClass) + 1;
+          if (!appInstanceClass) // no splash screens needed in taskbar. Also see FIXME below
             continue;
 
           for (launcherIter++; launcherIter != launcherList.end(); launcherIter++) {
             pLauncher = (*launcherIter);
-            launcherBaseName = basename(const_cast<char*>(pLauncher->getCommand().c_str()));
-            if (strncmp((char*)appCmd, launcherBaseName,strlen(launcherBaseName)) == 0)
+            // Compare binary name against this particular instance
+            if (strncasecmp((char*)appInstanceClass,
+                basename(const_cast<char*>(pLauncher->getCommand().c_str())),
+                strlen(basename(const_cast<char*>(pLauncher->getCommand().c_str())))) == 0) {
               icon = pLauncher->getIconName();
+            // Compare binary name against general window class for app
+            } else if (strncasecmp((char*)appGeneralClass,
+                basename(const_cast<char*>(pLauncher->getCommand().c_str())),
+                strlen(basename(const_cast<char*>(pLauncher->getCommand().c_str())))) == 0) {
+              icon = pLauncher->getIconName();
+            // Compare configured title against this particular instance
+            } else if (strncasecmp((char*)appInstanceClass,
+                basename(const_cast<char*>(pLauncher->getTitle().c_str())),
+                strlen(basename(const_cast<char*>(pLauncher->getTitle().c_str())))) == 0) {
+              icon = pLauncher->getIconName();
+            // Compare configured title  against general window class for app
+            } else if (strncasecmp((char*)appGeneralClass,
+                basename(const_cast<char*>(pLauncher->getTitle().c_str())),
+                strlen(basename(const_cast<char*>(pLauncher->getTitle().c_str())))) == 0) {
+              icon = pLauncher->getIconName();
+            }
           }
         }
 
@@ -616,8 +621,9 @@ int mapIcons() {
         titl = barwin.windowProp(&w, "WM_NAME", &tmp_len);
 
         // Without WM_NAME, either there is a splashscreen window which we should
-        // skip, or we have an old NET_CLIENT_LIST. FIXME: the second option is not
-        // dealt with yet. We need to retreive a new NET_CLIENT_LIST and reiterate
+        // skip, or we have an old NET_CLIENT_LIST.
+        // FIXME: the second option is not dealt with yet. We need to retreive a
+        // new NET_CLIENT_LIST and reiterate
         if (!titl) {
           std::cout << "Not adding icon: no WM_NAME for id " << winid << std::endl;
           continue;
