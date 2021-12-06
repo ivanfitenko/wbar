@@ -582,9 +582,11 @@ int mapIcons() {
           launcherIter = launcherList.begin();
 
           appInstanceClass = barwin.windowProp(&w, "WM_CLASS", &tmp_len);
-          appGeneralClass = appInstanceClass + strlen((const char *)appInstanceClass) + 1;
-          if (!appInstanceClass) // no splash screens needed in taskbar. Also see FIXME below
+          // no splash screens, notifications etc needed in taskbar. Also see FIXME below
+          if (!appInstanceClass) 
             continue;
+
+          appGeneralClass = appInstanceClass + strlen((const char *)appInstanceClass) + 1;
 
           for (launcherIter++; launcherIter != launcherList.end(); launcherIter++) {
             pLauncher = (*launcherIter);
