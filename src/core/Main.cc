@@ -603,6 +603,8 @@ int mapIcons() {
                 strlen(basename(const_cast<char*>(pLauncher->getTitle().c_str())))) == 0) {
               icon = pLauncher->getIconName();
             }
+          }
+        }
 
         //windowIcon() allocates memory which must be explicitly freed
         void *iconCheckBuffer = barwin.windowIcon(w, &iiw, &iih);
