@@ -532,28 +532,20 @@ int mapIcons() {
   std::string packagename = PACKAGE_NAME;
   std::string icon, cmnd;
   unsigned char *titl;
-  int iconpos;
-  int firstrun = 0;
+  int iconpos = 0;
 
-  //for icon selection loop when --user-icons is set
+  //main icon list used to temporary store app data before it is drawn & dropped
+  std::list<App *> iconList;
+  std::list<App *>::iterator iconIter;
+  iconList = config.getAppList();
+  iconIter = iconList.begin();
+
+  //This holds the pre-configured launcher apps. It is used
+  //for icon selection loop for running apps when --user-icons is set
   std::list<App *> launcherList;
   std::list<App *>::iterator launcherIter;
   unsigned char *appInstanceClass, *appGeneralClass;
   App *pLauncher;
-
-  iconpos = (configitems - 1);
-  // on the first run, there will be no icons displayed
-  if (!barra->iconsShown()) {
-    firstrun = 1;
-    iconpos = 0;
-  } else {
-    //roll back the list to contain only the icons from config
-    while ((size_t) list.size() > configitems) {
-      list.pop_back();
-    }
-    it=list.end();
-    it--;
-  }
 
   // add currently running tasks to the list
   if ((taskbar) &&
@@ -611,12 +603,13 @@ int mapIcons() {
                 strlen(basename(const_cast<char*>(pLauncher->getTitle().c_str())))) == 0) {
               icon = pLauncher->getIconName();
             }
-          }
-        }
 
-        if ((barwin.windowIcon(w, &iiw, &iih) == NULL) && (icon == "")) {
+        //windowIcon() allocates memory which must be explicitly freed
+        void *iconCheckBuffer = barwin.windowIcon(w, &iiw, &iih);
+        if ((iconCheckBuffer == NULL) && (icon == "")) {
           icon = pixmapdir + "/" + packagename + "/" + "questionmark.png";
         }
+        free(iconCheckBuffer);
 
         cmnd = "";
         winid = (unsigned long) w;
@@ -635,31 +628,20 @@ int mapIcons() {
 
         App *app = new App(icon, cmnd, title, winid);
 
-        list.push_back(app);
+        iconList.push_back(app);
 
         icon = cmnd = "";
 
         titl = NULL;
 
         winid = 0;
+
       }
     }
   }
 
-  //if this is not an initial run
-  if (!firstrun)
-
-    // and we added no windows
-    if ((size_t) list.size() == configitems)
-        //then there is no need to add icons
-        {
-      return 0;
-      //TODO: there might be a case when icon of an exising window has changed, e.g
-      // some messenger wants to show that there are new messages. We need to track it
-    }
-
-  for (it++; it != list.end(); it++) {
-    p = (*it);
+  for (iconIter++; iconIter != iconList.end(); iconIter++) {
+    p = (*iconIter);
 
     try {
       if (p->getIconName() != "")
@@ -676,6 +658,7 @@ int mapIcons() {
           ((SuperBar *)barra)->addIcon(
               iconpos, p->getIconName(), p->getCommand(), p->getTitle(),
               p->getWinid(), icondata, iw, ih, refl_perc, refl_alpha);
+              free(icondata);
         } else {
           std::cout << "window has gone, not adding" << std::endl;
           return -1;
@@ -687,9 +670,6 @@ int mapIcons() {
       std::cout << m << std::endl;
     }
 
-    if (p) {
-      delete p;
-    }
   }
   // The new taskbar may contain less icons than before, so next elements
   // are dropped as the ones being obsolete garbage.
@@ -698,9 +678,14 @@ int mapIcons() {
   (void) XSetErrorHandler(oldXHandler);
   barra->scale();
 
-  if (firstrun) {
-    // decrement from list.end() to be deferecenceable
-    it--;
+  while (!iconList.empty()) {
+    delete iconList.back();
+    iconList.pop_back();
+  }
+
+  while (!launcherList.empty()) {
+    delete launcherList.back();
+    launcherList.pop_back();
   }
 
   return 0;

@@ -318,6 +318,8 @@ Atom *XWin::haveAtom(Window targetWin, const char *reqProp) {
 }
 
 // get icon parameters and data, based on xgeticon by Bertrand Mesot
+//WARNING: this function makes unbufferred use of repack64()
+//WARNING: this means that you must explicitly free() the return value after use
 unsigned char *XWin::windowIcon(Window targetWin, int *iw, int *ih) {
   Atom a = XInternAtom(display, "_NET_WM_ICON", True), actual_type;
 
@@ -456,6 +458,8 @@ void XWin::selectWindowInput(unsigned long winid) {
   XSelectInput(display, (Window) winid, PropertyChangeMask);
 }
 
+//WARNING: this function does not deallocate memory used for return value
+//WARNING: You must explicitly call free() on the returned pointer after use
 unsigned char *repack64(unsigned char *repack_data, long repack_sz) {
   unsigned char *repack;
   long repack_alloc;
