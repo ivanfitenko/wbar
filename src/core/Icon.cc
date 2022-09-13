@@ -28,6 +28,7 @@ Icon::Icon(string iconImg, string cmd, int xx, int yy, unsigned long winid,
   if (iconImg == "") {
     DATA32 *imagedata = imlib_image_get_data();
     memmove(imagedata, icondata, iw * ih * 4);
+    free(icondata);
     imlib_image_put_back_data(imagedata);
   }
 

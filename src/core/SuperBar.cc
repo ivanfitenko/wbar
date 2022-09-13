@@ -148,7 +148,8 @@ void SuperBar::addIcon(unsigned int iconpos, string path, string comm,
   may become outdated now, so the list is outdated and needs to be cleaned up.
   */
   while (iconpos < icons.size()) {
-    icons.erase(icons.begin() + iconpos);
+    delete (SuperIcon *)icons.back();
+    icons.pop_back();
   }
 
   if (font) {
