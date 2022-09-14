@@ -606,12 +606,16 @@ int mapIcons() {
           }
         }
 
-        //windowIcon() allocates memory which must be explicitly freed
+        // Check if the icon was set, otherwise use questionmark icon.
+        // NOTE: windowIcon() allocates memory which must be explicitly freed
         void *iconCheckBuffer = barwin.windowIcon(w, &iiw, &iih);
-        if ((iconCheckBuffer == NULL) && (icon == "")) {
-          icon = pixmapdir + "/" + packagename + "/" + "questionmark.png";
+        if (iconCheckBuffer == NULL) {
+          if (icon == "") {
+            icon = pixmapdir + "/" + packagename + "/" + "questionmark.png";
+          }
+        } else {
+            free(iconCheckBuffer); //windowIcon() allocates memory which must be explicitly freed
         }
-        free(iconCheckBuffer);
 
         cmnd = "";
         winid = (unsigned long) w;
